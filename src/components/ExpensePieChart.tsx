@@ -136,7 +136,7 @@ const ExpensePieChart: React.FC = () => {
               ))}
             </Pie>
             <Tooltip
-              formatter={(value: number) => [`$${value.toFixed(2)}`, "Amount"]}
+              formatter={(value: number) => [`₹${value.toFixed(2)}`, "Amount"]}
             />
             <Legend />
           </PieChart>

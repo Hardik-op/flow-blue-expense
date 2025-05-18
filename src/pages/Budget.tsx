@@ -91,7 +91,7 @@ const BudgetPage = () => {
             <div className="text-center">
               <p className="text-muted-foreground text-sm">Total Budget</p>
               <p className="text-3xl font-bold mt-1">
-                ${budgets.reduce((sum, b) => sum + b.amount, 0).toFixed(2)}
+                ₹{budgets.reduce((sum, b) => sum + b.amount, 0).toFixed(2)}
               </p>
             </div>
           </CardContent>
@@ -128,7 +128,7 @@ const BudgetPage = () => {
               </div>
               <div className="grid gap-2">
                 <label htmlFor="amount" className="text-sm font-medium">
-                  Budget Amount ($)
+                  Budget Amount (₹)
                 </label>
                 <Input
                   id="amount"
@@ -195,16 +195,16 @@ const BudgetPage = () => {
                   <div className="flex justify-between text-sm">
                     <div>
                       <span className="text-muted-foreground">Spent: </span>
-                      <span className="font-medium">${spent.toFixed(2)}</span>
+                      <span className="font-medium">₹{spent.toFixed(2)}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Budget: </span>
-                      <span className="font-medium">${budgetAmount.toFixed(2)}</span>
+                      <span className="font-medium">₹{budgetAmount.toFixed(2)}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Remaining: </span>
                       <span className={`font-medium ${remaining < 0 ? 'text-expense-red-500' : ''}`}>
-                        ${remaining.toFixed(2)}
+                        ₹{remaining.toFixed(2)}
                       </span>
                     </div>
                   </div>

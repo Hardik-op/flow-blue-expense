@@ -18,7 +18,7 @@ const ExpenseSummaryCard = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">${totalExpenses.toFixed(2)}</p>
+          <p className="text-2xl font-bold">₹{totalExpenses.toFixed(2)}</p>
         </CardContent>
       </Card>
       
@@ -29,7 +29,7 @@ const ExpenseSummaryCard = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-2xl font-bold">${totalBudget.toFixed(2)}</p>
+          <p className="text-2xl font-bold">₹{totalBudget.toFixed(2)}</p>
         </CardContent>
       </Card>
       
@@ -41,7 +41,7 @@ const ExpenseSummaryCard = () => {
         </CardHeader>
         <CardContent>
           <p className={`text-2xl font-bold ${budgetRemaining < 0 ? 'text-expense-red-500' : ''}`}>
-            ${budgetRemaining.toFixed(2)}
+            ₹{budgetRemaining.toFixed(2)}
           </p>
         </CardContent>
       </Card>

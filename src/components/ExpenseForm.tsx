@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -97,10 +96,18 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     if (expenseToEdit) {
       updateExpense({
         id: expenseToEdit.id,
-        ...data,
+        amount: data.amount,
+        date: data.date,
+        category: data.category,
+        description: data.description,
       });
     } else {
-      addExpense(data);
+      addExpense({
+        amount: data.amount,
+        date: data.date,
+        category: data.category,
+        description: data.description,
+      });
     }
     
     setOpen(false);
@@ -130,7 +137,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Amount ($)</FormLabel>
+                  <FormLabel>Amount (₹)</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
