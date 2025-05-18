@@ -108,7 +108,7 @@ const Reports = () => {
                   }
                 </h3>
                 <p className="text-3xl font-bold">
-                  ${report.totalAmount.toFixed(2)}
+                  ₹{report.totalAmount.toFixed(2)}
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">
                   Total expenses for this {reportType === "monthly" ? "month" : "year"}
@@ -136,7 +136,7 @@ const Reports = () => {
                           <span className="font-medium">{category}</span>
                           <span className="text-muted-foreground text-sm">{percentage}%</span>
                         </div>
-                        <p className="text-xl font-bold mt-2">${amount.toFixed(2)}</p>
+                        <p className="text-xl font-bold mt-2">₹{amount.toFixed(2)}</p>
                       </CardContent>
                     </Card>
                   );

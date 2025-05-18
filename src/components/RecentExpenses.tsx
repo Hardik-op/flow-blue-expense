@@ -68,7 +68,7 @@ const RecentExpenses = () => {
                     <TableCell>{expense.description}</TableCell>
                     <TableCell>{expense.category}</TableCell>
                     <TableCell className="text-right">
-                      ${expense.amount.toFixed(2)}
+                      ₹{expense.amount.toFixed(2)}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">

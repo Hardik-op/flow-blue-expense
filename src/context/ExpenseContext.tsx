@@ -1,5 +1,5 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import { 
   Expense, 
@@ -7,6 +7,7 @@ import {
   Budget,
   MonthlyReport 
 } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ExpenseContextType {
   expenses: Expense[];
@@ -48,42 +49,42 @@ const ExpenseContext = createContext<ExpenseContextType | undefined>(undefined);
 // Sample data for initial state
 const sampleExpenses: Expense[] = [
   {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     amount: 150,
     date: new Date(2024, 4, 1),
     category: 'Food',
     description: 'Grocery shopping'
   },
   {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     amount: 800,
     date: new Date(2024, 4, 1),
     category: 'Housing',
     description: 'Monthly rent'
   },
   {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     amount: 50,
     date: new Date(2024, 4, 2),
     category: 'Transportation',
     description: 'Gas'
   },
   {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     amount: 200,
     date: new Date(2024, 4, 3),
     category: 'Entertainment',
     description: 'Concert tickets'
   },
   {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     amount: 120,
     date: new Date(2024, 4, 5),
     category: 'Utilities',
     description: 'Electricity bill'
   },
   {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     amount: 75,
     date: new Date(2024, 3, 28),
     category: 'Food',
@@ -109,31 +110,179 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [expenses, setExpenses] = useState<Expense[]>(sampleExpenses);
   const [budgets, setBudgets] = useState<Budget[]>(sampleBudgets);
   
-  const addExpense = (expense: Omit<Expense, "id">) => {
-    const newExpense = { ...expense, id: uuidv4() };
-    setExpenses(prev => [...prev, newExpense]);
-    toast.success("Expense added successfully");
-  };
+  // Fetch expenses from Supabase
+  useEffect(() => {
+    fetchExpenses();
+    fetchBudgets();
+  }, []);
 
-  const updateExpense = (expense: Expense) => {
-    setExpenses(prev => prev.map(e => e.id === expense.id ? expense : e));
-    toast.success("Expense updated successfully");
-  };
-
-  const deleteExpense = (id: string) => {
-    setExpenses(prev => prev.filter(e => e.id !== id));
-    toast.success("Expense deleted successfully");
-  };
-
-  const setBudget = (budget: Budget) => {
-    setBudgets(prev => {
-      const exists = prev.find(b => b.category === budget.category);
-      if (exists) {
-        return prev.map(b => b.category === budget.category ? budget : b);
+  const fetchExpenses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('*');
+      
+      if (error) throw error;
+      
+      // Convert the data to match our Expense type
+      const formattedData: Expense[] = data.map(item => ({
+        id: item.id,
+        amount: Number(item.amount),
+        date: new Date(item.date),
+        category: item.category as Category,
+        description: item.description
+      }));
+      
+      if (formattedData.length > 0) {
+        setExpenses(formattedData);
       }
-      return [...prev, budget];
-    });
-    toast.success(`Budget for ${budget.category} set to $${budget.amount}`);
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+    }
+  };
+  
+  const fetchBudgets = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('budget')
+        .select('*');
+      
+      if (error) throw error;
+      
+      // Convert the data to match our Budget type
+      const formattedData: Budget[] = data.map(item => ({
+        category: item.category as Category,
+        amount: Number(item.amount)
+      }));
+      
+      if (formattedData.length > 0) {
+        setBudgets(formattedData);
+      }
+    } catch (error) {
+      console.error('Error fetching budgets:', error);
+    }
+  };
+
+  const addExpense = async (expense: Omit<Expense, "id">) => {
+    try {
+      // First, insert into Supabase
+      const { data, error } = await supabase
+        .from('expenses')
+        .insert({
+          amount: expense.amount,
+          date: expense.date.toISOString(),
+          category: expense.category,
+          description: expense.description
+        })
+        .select();
+      
+      if (error) throw error;
+      
+      if (data && data[0]) {
+        // Create a new expense object with the ID from Supabase
+        const newExpense: Expense = {
+          id: data[0].id,
+          amount: expense.amount,
+          date: expense.date,
+          category: expense.category,
+          description: expense.description
+        };
+        
+        // Then update local state
+        setExpenses(prev => [...prev, newExpense]);
+        toast.success("Expense added successfully");
+      }
+    } catch (error) {
+      console.error('Error adding expense:', error);
+      toast.error("Failed to add expense");
+    }
+  };
+
+  const updateExpense = async (expense: Expense) => {
+    try {
+      // First, update in Supabase
+      const { error } = await supabase
+        .from('expenses')
+        .update({
+          amount: expense.amount,
+          date: expense.date.toISOString(),
+          category: expense.category,
+          description: expense.description
+        })
+        .eq('id', expense.id);
+      
+      if (error) throw error;
+      
+      // Then update local state
+      setExpenses(prev => prev.map(e => e.id === expense.id ? expense : e));
+      toast.success("Expense updated successfully");
+    } catch (error) {
+      console.error('Error updating expense:', error);
+      toast.error("Failed to update expense");
+    }
+  };
+
+  const deleteExpense = async (id: string) => {
+    try {
+      // First, delete from Supabase
+      const { error } = await supabase
+        .from('expenses')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      // Then update local state
+      setExpenses(prev => prev.filter(e => e.id !== id));
+      toast.success("Expense deleted successfully");
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+      toast.error("Failed to delete expense");
+    }
+  };
+
+  const setBudget = async (budget: Budget) => {
+    try {
+      // Check if this budget category already exists
+      const existingBudget = budgets.find(b => b.category === budget.category);
+      
+      if (existingBudget) {
+        // Update existing budget in Supabase
+        const { error } = await supabase
+          .from('budget')
+          .update({
+            amount: budget.amount
+          })
+          .eq('category', budget.category);
+          
+        if (error) throw error;
+      } else {
+        // Insert new budget in Supabase
+        const { error } = await supabase
+          .from('budget')
+          .insert({
+            category: budget.category,
+            amount: budget.amount,
+            period: 'monthly' // Default period
+          });
+          
+        if (error) throw error;
+      }
+      
+      // Update local state
+      setBudgets(prev => {
+        const exists = prev.find(b => b.category === budget.category);
+        if (exists) {
+          return prev.map(b => b.category === budget.category ? budget : b);
+        }
+        return [...prev, budget];
+      });
+      
+      toast.success(`Budget for ${budget.category} set to ₹${budget.amount}`);
+    } catch (error) {
+      console.error('Error setting budget:', error);
+      toast.error("Failed to set budget");
+    }
   };
 
   const getMonthlyReport = (month: number, year: number): MonthlyReport => {

@@ -195,7 +195,7 @@ const ExpenseList = () => {
                 <label className="text-sm font-medium mb-1 block">Min Amount</label>
                 <Input
                   type="number"
-                  placeholder="Min $"
+                  placeholder="Min ₹"
                   value={minAmount}
                   onChange={(e) => setMinAmount(e.target.value)}
                 />
@@ -205,7 +205,7 @@ const ExpenseList = () => {
                 <label className="text-sm font-medium mb-1 block">Max Amount</label>
                 <Input
                   type="number"
-                  placeholder="Max $"
+                  placeholder="Max ₹"
                   value={maxAmount}
                   onChange={(e) => setMaxAmount(e.target.value)}
                 />
@@ -269,7 +269,7 @@ const ExpenseList = () => {
                         <TableCell>{expense.description}</TableCell>
                         <TableCell>{expense.category}</TableCell>
                         <TableCell className="text-right font-medium">
-                          ${expense.amount.toFixed(2)}
+                          ₹{expense.amount.toFixed(2)}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
