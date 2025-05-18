@@ -32,9 +32,10 @@ export interface MonthlyReport {
   expensesByCategory: Record<Category, number>;
 }
 
+// Updated DateRange to make properties optional to match react-day-picker's DateRange
 export type DateRange = {
   from: Date | undefined;
-  to: Date | undefined;
+  to?: Date | undefined; // Made 'to' optional with '?'
 };
 
 export type SortDirection = 'asc' | 'desc';

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
@@ -17,7 +16,12 @@ interface ExpenseContextType {
   deleteExpense: (id: string) => void;
   setBudget: (budget: Budget) => void;
   getMonthlyReport: (month: number, year: number) => MonthlyReport;
-  getYearlyReport: (year: number) => { totalAmount: number; expensesByCategory: Record<Category, number> };
+  getYearlyReport: (year: number) => { 
+    totalAmount: number; 
+    expensesByCategory: Record<Category, number>;
+    month: string;
+    year: number;
+  };
   categories: Category[];
   getTotalExpenses: () => number;
   getExpensesByCategory: () => Record<Category, number>;
@@ -177,7 +181,9 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
     
     return {
       totalAmount,
-      expensesByCategory
+      expensesByCategory,
+      month: 'Total',
+      year
     };
   };
 
